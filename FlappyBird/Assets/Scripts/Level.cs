@@ -8,29 +8,53 @@ public class Level : MonoBehaviour
     private const float PIPE_WIDTH = 7.8f;
     private const float PIPE_HEAD_HEIGHT = 3.75f;
     private const float PIPE_MOVE_SPEED = 3f;
+    private const float PIPE_DESTROY_X_POSITION = -100f;
+    private const float PIPE_SPAWN_X_POSITION = +100f;
 
 
     private List<Pipe> pipeList;
+    private float pipeSpawnTimer;
+    private float pipeSpawnTimerMax;
 
     private void Awake()
     {
         pipeList = new List<Pipe>();
+        pipeSpawnTimerMax = .5f;
     }
     private void Start()
     {
-        CreateGapPipes(50f, 20f, 20f);
+        //CreateGapPipes(50f, 20f, 20f);
     }
 
     private void Update()
     {
         HandlePipeMovement();
+        HandlePipeSpawning();
+    }
+
+    private void HandlePipeSpawning()
+    {
+        pipeSpawnTimer -= Time.deltaTime;
+        if (pipeSpawnTimer < 0)
+        {
+            //Time to spawn another pipe
+            pipeSpawnTimer += pipeSpawnTimerMax;
+            CreateGapPipes(50f, 20f, PIPE_SPAWN_X_POSITION);
+        }
     }
 
     private void HandlePipeMovement()
     {
-        foreach (Pipe pipe in pipeList)
+        for (int i=0; i<pipeList.Count; i++)
         {
+            Pipe pipe = pipeList[i];
             pipe.Move();
+            if (pipe.GetXPosition() < PIPE_DESTROY_X_POSITION)
+            {
+                pipe.DestroySelf();
+                pipeList.Remove(pipe);
+                i--;
+            }
         }
     }
 
@@ -98,6 +122,17 @@ public class Level : MonoBehaviour
         {
             pipeHeadTransform.position += new Vector3(-1, 0, 0) * PIPE_MOVE_SPEED * Time.deltaTime;
             pipeBodyTransform.position += new Vector3(-1, 0, 0) * PIPE_MOVE_SPEED * Time.deltaTime;
+        }
+
+        public float GetXPosition()
+        {
+            return pipeHeadTransform.position.x;
+        }
+
+        public void DestroySelf()
+        {
+            Destroy(pipeHeadTransform.gameObject);
+            Destroy(pipeBodyTransform.gameObject);
         }
     }
 }
