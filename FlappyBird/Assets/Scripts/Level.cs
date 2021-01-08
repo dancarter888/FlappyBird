@@ -7,7 +7,7 @@ public class Level : MonoBehaviour
     private const float CAMERA_ORTHO_SIZE = 50f;
     private const float PIPE_WIDTH = 7.8f;
     private const float PIPE_HEAD_HEIGHT = 3.75f;
-    private const float PIPE_MOVE_SPEED = 3f;
+    private const float PIPE_MOVE_SPEED = 30f;
     private const float PIPE_DESTROY_X_POSITION = -100f;
     private const float PIPE_SPAWN_X_POSITION = +100f;
 
@@ -15,11 +15,13 @@ public class Level : MonoBehaviour
     private List<Pipe> pipeList;
     private float pipeSpawnTimer;
     private float pipeSpawnTimerMax;
+    private float gapSize;
 
     private void Awake()
     {
         pipeList = new List<Pipe>();
-        pipeSpawnTimerMax = .5f;
+        pipeSpawnTimerMax = 1f;
+        gapSize = 50f;
     }
     private void Start()
     {
@@ -39,7 +41,14 @@ public class Level : MonoBehaviour
         {
             //Time to spawn another pipe
             pipeSpawnTimer += pipeSpawnTimerMax;
-            CreateGapPipes(50f, 20f, PIPE_SPAWN_X_POSITION);
+
+            float heightEdgeLimit = 10f;
+            float minHeight = gapSize * .5f + heightEdgeLimit;
+            float totalHeight = CAMERA_ORTHO_SIZE * 2f;
+            float maxHeight = totalHeight - gapSize * .5f - heightEdgeLimit;
+
+            float height = Random.Range(minHeight, maxHeight);
+            CreateGapPipes(height, gapSize, PIPE_SPAWN_X_POSITION);
         }
     }
 
