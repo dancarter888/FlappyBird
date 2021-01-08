@@ -13,15 +13,47 @@ public class Level : MonoBehaviour
 
 
     private List<Pipe> pipeList;
+    private int pipesSpawned;
     private float pipeSpawnTimer;
     private float pipeSpawnTimerMax;
     private float gapSize;
+
+    private void SetDifficulty(Difficulty difficulty)
+    {
+        switch (difficulty)
+        {
+            case Difficulty.Easy:
+                gapSize = 50f;
+                pipeSpawnTimerMax = 1.2f;
+                break;
+            case Difficulty.Medium:
+                gapSize = 40f;
+                pipeSpawnTimerMax = 1.1f;
+                break;
+            case Difficulty.Hard:
+                gapSize = 33f;
+                pipeSpawnTimerMax = 1.0f;
+                break;
+            case Difficulty.Impossible:
+                gapSize = 24f;
+                pipeSpawnTimerMax = .8f;
+                break;
+        }
+    }
+
+    public enum Difficulty
+    {
+        Easy,
+        Medium,
+        Hard,
+        Impossible,
+    }
 
     private void Awake()
     {
         pipeList = new List<Pipe>();
         pipeSpawnTimerMax = 1f;
-        gapSize = 50f;
+        SetDifficulty(Difficulty.Easy);
     }
     private void Start()
     {
@@ -67,10 +99,20 @@ public class Level : MonoBehaviour
         }
     }
 
+    private Difficulty GetDifficulty()
+    {
+        if (pipesSpawned >= 30) return Difficulty.Impossible;
+        if (pipesSpawned >= 20) return Difficulty.Hard;
+        if (pipesSpawned >= 10) return Difficulty.Medium;
+        return Difficulty.Easy;
+    }
+
     private void CreateGapPipes(float gapY, float gapSize, float xPosition)
     {
         CreatePipe(gapY - gapSize *.5f, xPosition, true); //Bottom Pipe
         CreatePipe(CAMERA_ORTHO_SIZE * 2f - gapY - gapSize * .5f, xPosition, false); //Top Pipe
+        pipesSpawned++;
+        SetDifficulty(GetDifficulty());
     }
 
     private void CreatePipe(float height, float xPosition, bool createBottom)
