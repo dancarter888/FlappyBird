@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey;
+using CodeMonkey.Utils;
 
 public class Level : MonoBehaviour
 {
@@ -82,6 +83,11 @@ public class Level : MonoBehaviour
     {
         //CMDebug.TextPopupMouse("Dead!");
         state = State.BirdDead;
+
+        FunctionTimer.Create(() =>
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+        }, 1f);
     }
 
     private void Update()
