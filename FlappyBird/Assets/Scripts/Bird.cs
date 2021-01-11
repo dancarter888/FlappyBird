@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey;
@@ -6,11 +7,21 @@ using CodeMonkey;
 public class Bird : MonoBehaviour
 {
     private const float JUMP_AMOUNT = 100f;
-    private Rigidbody2D birdrigidbody2D;
+
+    public static Bird instance;
+
+    public static Bird GetInstance()
+    {
+        return instance;
+    }
+
+    public event EventHandler OnDied;
+    private Rigidbody2D birdRigidbody2D;
 
     private void Awake()
     {
-        birdrigidbody2D = GetComponent<Rigidbody2D>();
+        instance = this;
+        birdRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
@@ -23,11 +34,12 @@ public class Bird : MonoBehaviour
 
     private void Jump()
     {
-        birdrigidbody2D.velocity = Vector2.up * JUMP_AMOUNT;
+        birdRigidbody2D.velocity = Vector2.up * JUMP_AMOUNT;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        CMDebug.TextPopupMouse("Dead!");
+        birdRigidbody2D.bodyType = RigidbodyType2D.Static;
+        if (OnDied != null) OnDied(this, EventArgs.Empty);
     }
 }

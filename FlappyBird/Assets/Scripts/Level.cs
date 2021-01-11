@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CodeMonkey;
 
 public class Level : MonoBehaviour
 {
@@ -25,6 +26,7 @@ public class Level : MonoBehaviour
     private float pipeSpawnTimer;
     private float pipeSpawnTimerMax;
     private float gapSize;
+    private State state;
 
     private void SetDifficulty(Difficulty difficulty)
     {
@@ -57,22 +59,38 @@ public class Level : MonoBehaviour
         Impossible,
     }
 
+    private enum State
+    {
+        Playing,
+        BirdDead,
+    }
+
     private void Awake()
     {
         instance = this;
         pipeList = new List<Pipe>();
         pipeSpawnTimerMax = 1f;
         SetDifficulty(Difficulty.Easy);
+        state = State.Playing;
     }
     private void Start()
     {
-        //CreateGapPipes(50f, 20f, 20f);
+        Bird.GetInstance().OnDied += Bird_OnDied;
+    }
+
+    private void Bird_OnDied(object sender, System.EventArgs e)
+    {
+        //CMDebug.TextPopupMouse("Dead!");
+        state = State.BirdDead;
     }
 
     private void Update()
     {
-        HandlePipeMovement();
-        HandlePipeSpawning();
+        if (state == State.Playing)
+        {
+            HandlePipeMovement();
+            HandlePipeSpawning();
+        }
     }
 
     private void HandlePipeSpawning()
