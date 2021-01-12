@@ -9,7 +9,7 @@ public class ScoreWindow : MonoBehaviour
 
     private void Awake()
     {
-        scoreText = transform.Find("ScoreText").GetComponent<Text>();
+        scoreText = transform.Find("scoreText").GetComponent<Text>();
     }
 
     private void Update()
